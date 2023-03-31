@@ -1,2 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using LandLord.Services;
+
+MenuService menuService = new();
+
+while (true)
+{
+    Console.Clear();
+    await menuService.MainMenu();
+    Console.ReadKey();
+}
+
+

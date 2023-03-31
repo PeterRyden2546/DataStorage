@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LandLord.Models.Entities;
 
@@ -13,11 +14,12 @@ internal class OrderEntity
 
     [Required]
     public int TenantId { get; set; }
+    public TenantEntity Tenant { get; set; } = null!;
 
-    [Required]
+    [AllowNull]
     public int EmployeId { get; set; }
+    public EmployeEntity Employe { get; set; } = null!;
 
-    public TenantEntity Order { get; set; } = null!;
-    public EmployeEntity Orders { get; set; } = null!;
-    public ICollection<OrderRowEntity> OrderRow = new HashSet<OrderRowEntity>();
+
+    public ICollection<OrderRowEntity> OrderRows = new HashSet<OrderRowEntity>();
 }

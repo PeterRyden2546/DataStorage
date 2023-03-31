@@ -28,6 +28,31 @@ internal class DataContext : DbContext
             optionsBuilder.UseSqlServer(_connectionString);
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EmployeEntity>()
+            .HasOne(e => e.Person)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<TenantEntity>()
+            .HasOne(e => e.Person)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<OrderEntity>()
+            .HasOne(o => o.Employe)
+            .WithMany(e => e.Orders)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<OrderEntity>()
+            .HasOne(o => o.Tenant)
+            .WithMany(t => t.Order)
+            .HasForeignKey(o => o.TenantId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        base.OnModelCreating(modelBuilder);
+    }
+
     #endregion
 
     #region entities
@@ -39,6 +64,8 @@ internal class DataContext : DbContext
     public DbSet<OrderRowEntity> OrderRows { get; set; } = null!;
     public DbSet<RoleEntity> Roles { get; set; } = null!;
     public DbSet<TenantEntity> Tenants { get; set; } = null!;
+    public DbSet<PersonEntity> Persons { get; set; } = null!;
+    public DbSet<StatusCodeEntity> StatusCodes { get; set; } = null!;
 
 
     #endregion

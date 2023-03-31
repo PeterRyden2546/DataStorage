@@ -12,6 +12,9 @@ internal class ApartmentEntity
     [StringLength(50)]
     public string City { get; set; } = null!;
 
+    [Column(TypeName = "char(6)")]
+    public string ZipCode { get; set; } = null!;
+
     [StringLength(70)]
     public string StreetName { get; set; } = null!;
 

@@ -4,6 +4,7 @@ using LandLord.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LandLord.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230318152719_ChangeTenantIdToRequiredInOrderEbtity")]
+    partial class ChangeTenantIdToRequiredInOrderEbtity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Apartments", (string)null);
+                    b.ToTable("Apartments");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.CommentEntity", b =>
@@ -67,7 +70,7 @@ namespace LandLord.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Comment")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
@@ -78,17 +81,13 @@ namespace LandLord.Migrations
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("WrittenAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderRowId");
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.EmployeEntity", b =>
@@ -111,7 +110,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.OrderEntity", b =>
@@ -138,7 +137,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.OrderRowEntity", b =>
@@ -169,6 +168,9 @@ namespace LandLord.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
@@ -181,7 +183,9 @@ namespace LandLord.Migrations
 
                     b.HasIndex("StatusCodeId");
 
-                    b.ToTable("OrderRows", (string)null);
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("OrderRows");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.PersonEntity", b =>
@@ -215,7 +219,7 @@ namespace LandLord.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Persons", (string)null);
+                    b.ToTable("Persons");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.RoleEntity", b =>
@@ -233,7 +237,7 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.StatusCodeEntity", b =>
@@ -251,7 +255,7 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StatusCodes", (string)null);
+                    b.ToTable("StatusCodes");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.TenantEntity", b =>
@@ -274,7 +278,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.CommentEntity", b =>
@@ -354,11 +358,19 @@ namespace LandLord.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LandLord.Models.Entities.TenantEntity", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Employe");
 
                     b.Navigation("OrdersId");
 
                     b.Navigation("StatusCode");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.TenantEntity", b =>

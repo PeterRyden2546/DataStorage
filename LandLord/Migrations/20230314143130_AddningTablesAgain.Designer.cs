@@ -4,6 +4,7 @@ using LandLord.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LandLord.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230314143130_AddningTablesAgain")]
+    partial class AddningTablesAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Apartments", (string)null);
+                    b.ToTable("Apartments");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.CommentEntity", b =>
@@ -67,7 +70,7 @@ namespace LandLord.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Comment")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
@@ -78,17 +81,13 @@ namespace LandLord.Migrations
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("WrittenAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderRowId");
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.EmployeEntity", b =>
@@ -111,7 +110,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.OrderEntity", b =>
@@ -138,7 +137,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.OrderRowEntity", b =>
@@ -160,13 +159,13 @@ namespace LandLord.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
+                    b.Property<int>("OrdersId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrdersIdId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StatusCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StatusId")
+                    b.Property<int>("TenantId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateAt")
@@ -175,13 +174,13 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeId");
+                    b.HasIndex("OrdersId1");
 
                     b.HasIndex("OrdersIdId");
 
-                    b.HasIndex("StatusCodeId");
+                    b.HasIndex("TenantId");
 
-                    b.ToTable("OrderRows", (string)null);
+                    b.ToTable("OrderRows");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.PersonEntity", b =>
@@ -215,7 +214,7 @@ namespace LandLord.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Persons", (string)null);
+                    b.ToTable("Persons");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.RoleEntity", b =>
@@ -233,7 +232,7 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.StatusCodeEntity", b =>
@@ -244,6 +243,12 @@ namespace LandLord.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("OrderRowId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StatusCode")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -251,7 +256,11 @@ namespace LandLord.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StatusCodes", (string)null);
+                    b.HasIndex("OrderRowId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("StatusCodes");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.TenantEntity", b =>
@@ -274,7 +283,7 @@ namespace LandLord.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.CommentEntity", b =>
@@ -336,9 +345,9 @@ namespace LandLord.Migrations
 
             modelBuilder.Entity("LandLord.Models.Entities.OrderRowEntity", b =>
                 {
-                    b.HasOne("LandLord.Models.Entities.EmployeEntity", "Employe")
+                    b.HasOne("LandLord.Models.Entities.EmployeEntity", "Orders")
                         .WithMany()
-                        .HasForeignKey("EmployeId")
+                        .HasForeignKey("OrdersId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -348,17 +357,36 @@ namespace LandLord.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LandLord.Models.Entities.StatusCodeEntity", "StatusCode")
+                    b.HasOne("LandLord.Models.Entities.TenantEntity", "Tenant")
                         .WithMany()
-                        .HasForeignKey("StatusCodeId")
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Employe");
+                    b.Navigation("Orders");
 
                     b.Navigation("OrdersId");
 
-                    b.Navigation("StatusCode");
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("LandLord.Models.Entities.StatusCodeEntity", b =>
+                {
+                    b.HasOne("LandLord.Models.Entities.OrderRowEntity", "OrderRow")
+                        .WithMany()
+                        .HasForeignKey("OrderRowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LandLord.Models.Entities.PersonEntity", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderRow");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("LandLord.Models.Entities.TenantEntity", b =>
